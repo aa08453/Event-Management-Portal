@@ -1,0 +1,199 @@
+{% extends 'base.html' %}
+
+{% block title %}Dashboard - Events Management Portal{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h1 class="h3 text-navy mb-0">Dashboard</h1>
+            <p class="text-muted">
+                Welcome, {{ user.username }} | 
+                {% if user.profile.user_type == 'event_manager' %}
+                    Event Manager
+                {% else %}
+                    Student
+                {% endif %}
+                {% if user.profile.department %}
+                    - {{ user.profile.department.name }}
+                {% endif %}
+            </p>
+        </div>
+        
+        {% if is_event_manager %}
+        <a href="{% url 'create_event' %}" class="btn btn-primary">
+            <i class="fas fa-plus me-2"></i> Create Event
+        </a>
+        {% endif %}
+    </div>
+    
+    <div class="row mb-4">
+        <div class="col-md-4">
+            <div class="card h-100">
+                <div class="card-body">
+                    <h5 class="card-title">Total Events</h5>
+                    <p class="text-muted">{% if is_event_manager %}Events you've organized{% else %}All events{% endif %}</p>
+                    <p class="display-4 fw-bold">{{ total_events }}</p>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-md-4">
+            <div class="card h-100">
+                <div class="card-body">
+                    <h5 class="card-title">Published Events</h5>
+                    <p class="text-muted">Live events</p>
+                    <p class="display-4 fw-bold">{{ published_count }}</p>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-md-4">
+            <div class="card h-100">
+                <div class="card-body">
+                    <h5 class="card-title">Upcoming</h5>
+                    <p class="text-muted">Events in the next 30 days</p>
+                    <p class="display-4 fw-bold">{{ upcoming_count }}</p>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="card">
+        <div class="card-header bg-white">
+            <h5 class="mb-0">{% if is_event_manager %}My Events{% else %}All Events{% endif %}</h5>
+            <p class="text-muted mb-0">
+                {% if is_event_manager %}
+                    Manage your events
+                {% else %}
+                    Discover what's happening on campus
+                {% endif %}
+            </p>
+        </div>
+        <div class="card-body">
+            {% if events %}
+                <div class="table-responsive">
+                    <table class="table table-hover">
+                        <thead class="table-light">
+                            <tr>
+                                <th>Event Name</th>
+                                <th>Date</th>
+                                <th>Time</th>
+                                <th>Location</th>
+                                <th>Status</th>
+                                {% if is_event_manager %}<th class="text-end">Actions</th>{% endif %}
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for event in events %}
+                                <tr>
+                                    <td class="fw-medium">{{ event.name }}</td>
+                                    <td>
+                                        <i class="fas fa-calendar-day me-1 text-muted"></i>
+                                        {{ event.date|date:"M d, Y" }}
+                                    </td>
+                                    <td>
+                                        <i class="fas fa-clock me-1 text-muted"></i>
+                                        {{ event.time|time:"g:i A" }}
+                                    </td>
+                                    <td>
+                                        <i class="fas fa-map-marker-alt me-1 text-muted"></i>
+                                        {{ event.location }}
+                                    </td>
+                                    <td>
+                                        {% if event.status == 'published' %}
+                                            <span class="badge bg-success-subtle text-success">Published</span>
+                                        {% elif event.status == 'draft' %}
+                                            <span class="badge bg-warning-subtle text-warning">Draft</span>
+                                        {% elif event.status == 'cancelled' %}
+                                            <span class="badge bg-danger-subtle text-danger">Cancelled</span>
+                                        {% elif event.status == 'completed' %}
+                                            <span class="badge bg-info-subtle text-info">Completed</span>
+                                        {% endif %}
+                                    </td>
+                                    {% if is_event_manager and event.organizer == user %}
+                                        <td class="text-end">
+                                            <div class="dropdown">
+                                                <button class="btn btn-sm btn-outline-secondary" type="button" data-bs-toggle="dropdown">
+                                                    <i class="fas fa-ellipsis-vertical"></i>
+                                                </button>
+                                                <ul class="dropdown-menu dropdown-menu-end">
+                                                    <li><h6 class="dropdown-header">Actions</h6></li>
+                                                    <li>
+                                                        <a class="dropdown-item" href="{% url 'edit_event' event.id %}">
+                                                            <i class="fas fa-edit me-2"></i> Edit
+                                                        </a>
+                                                    </li>
+                                                    <li>
+                                                        <button class="dropdown-item text-danger delete-event" 
+                                                                data-bs-toggle="modal" 
+                                                                data-bs-target="#deleteEventModal"
+                                                                data-event-id="{{ event.id }}"
+                                                                data-event-name="{{ event.name }}">
+                                                            <i class="fas fa-trash-alt me-2"></i> Delete
+                                                        </button>
+                                                    </li>
+                                                </ul>
+                                            </div>
+                                        </td>
+                                    {% endif %}
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            {% else %}
+                <div class="text-center py-5">
+                    <p class="text-muted mb-3">No events found</p>
+                    {% if is_event_manager %}
+                        <a href="{% url 'create_event' %}" class="btn btn-outline-primary">
+                            <i class="fas fa-plus me-2"></i> Create your first event
+                        </a>
+                    {% endif %}
+                </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+
+<!-- Delete Event Modal -->
+<div class="modal fade" id="deleteEventModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Are you sure?</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <p>This action cannot be undone. This will permanently delete the event "<span id="eventNameToDelete"></span>" and remove it from the database.</p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                <form id="deleteEventForm" method="post">
+                    {% csrf_token %}
+                    <button type="submit" class="btn btn-danger">Delete</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Handle delete event modal
+        const deleteModal = document.getElementById('deleteEventModal');
+        if (deleteModal) {
+            deleteModal.addEventListener('show.bs.modal', function(event) {
+                const button = event.relatedTarget;
+                const eventId = button.getAttribute('data-event-id');
+                const eventName = button.getAttribute('data-event-name');
+                
+                document.getElementById('eventNameToDelete').textContent = eventName;
+                document.getElementById('deleteEventForm').action = `/events/delete/${eventId}/`;
+            });
+        }
+    });
+</script>
+{% endblock %}

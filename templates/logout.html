@@ -1,0 +1,27 @@
+{% extends 'base.html' %}
+
+{% block title %}Logged Out - Events Management Portal{% endblock %}
+
+{% block content %}
+<div class="min-vh-100 d-flex align-items-center bg-light">
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-md-6 text-center">
+                <div class="card shadow">
+                    <div class="card-body p-5">
+                        <div class="mb-4">
+                            <i class="fas fa-check-circle text-success fa-4x"></i>
+                        </div>
+                        <h1 class="h3 mb-3">You have been logged out</h1>
+                        <p class="text-muted mb-4">Thank you for using Events Management Portal</p>
+                        
+                        <a href="{% url 'login' %}" class="btn btn-primary">
+                            <i class="fas fa-sign-in-alt me-2"></i> Log In Again
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

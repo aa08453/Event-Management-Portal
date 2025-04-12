@@ -1,0 +1,71 @@
+{% extends 'base.html' %}
+{% load crispy_forms_tags %}
+
+{% block title %}Login - Events Management Portal{% endblock %}
+
+{% block content %}
+{% comment %} <div class="min-vh-100 d-flex align-items-center bg-light"> {% endcomment %}
+    <style>
+        .bg-image {
+            background-image: url('/static/images/habiblogo.png');
+            background-size: contain;
+            background-position: center;
+            background-repeat: no-repeat;
+            background-color: rgb(217, 204, 228);
+                   
+            z-index: -1;
+        }
+    
+        .card-set {
+            max-width: 520px;
+            margin: 100px auto;
+            padding: 20px;
+            background: rgba(255, 255, 255, 0.5); 
+            backdrop-filter: blur(8px);
+            border-radius: 8px;
+            border: 1px solid rgba(0, 0, 0, 0.1);
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+            box-sizing: border-box;
+        }
+    </style>
+    
+        
+<div class="min-vh-100 d-flex align-items-center bg-image" style="background-color:rgb(191, 164, 188);">
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-md-6">
+
+                {% comment %} <div class="text-center mb-4">
+                    <h1 class="h2 text-navy">Events Management Portal</h1>
+                    <p class="text-muted">Manage and discover campus events</p>
+                </div> {% endcomment %}
+                
+                <div class="card shadow card-set">
+                    <div class="card-body p-4">
+                        <div class="text-center mb-4">
+                            <h1 class="h2 text-navy">Events Management Portal</h1>
+                            {% comment %} <p class="text-muted">Manage and discover campus events</p> {% endcomment %}
+                        </div>
+                        <h2 class="h4 mb-3 text-center">Welcome</h2>
+                        <p class="text-muted mb-4">Login into your account</p>
+                        
+                        <form method="post">
+                            {% csrf_token %}
+                            {{ form|crispy }}
+                            <div class="d-grid gap-2 mt-4">
+                                <button type="submit" class="btn btn-primary">Sign In</button>
+                            </div>
+                        </form>
+                        
+                        {% comment %} <div class="mt-4 small text-muted">
+                            <p>Demo accounts:</p>
+                            <p>Event Manager: <span class="fw-bold">manager1</span> / password</p>
+                            <p>Student: <span class="fw-bold">student1</span> / password</p>
+                        </div> {% endcomment %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

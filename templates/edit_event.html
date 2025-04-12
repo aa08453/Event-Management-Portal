@@ -1,0 +1,243 @@
+{% extends 'base.html' %}
+{% load crispy_forms_tags %}
+
+{% block title %}Edit Event - Events Management Portal{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <h1 class="h3 text-navy mb-4">Edit Event</h1>
+            
+            <div class="card">
+                <div class="card-header bg-white">
+                    <h5 class="mb-0">Event Details</h5>
+                    <p class="text-muted mb-0">Update the information for "{{ event.name }}"</p>
+                </div>
+                <div class="card-body">
+                    <form method="post">
+                        {% csrf_token %}
+                        
+                        <div class="mb-3">
+                            <label for="{{ form.name.id_for_label }}" class="form-label">
+                                Event Name <span class="text-danger">*</span>
+                            </label>
+                            {{ form.name }}
+                            {% if form.name.errors %}
+                                <div class="text-danger mt-1">
+                                    <i class="fas fa-exclamation-circle me-1"></i>
+                                    {{ form.name.errors|join:" " }}
+                                </div>
+                            {% endif %}
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label for="{{ form.description.id_for_label }}" class="form-label">
+                                Description <span class="text-danger">*</span>
+                            </label>
+                            {{ form.description }}
+                            {% if form.description.errors %}
+                                <div class="text-danger mt-1">
+                                    <i class="fas fa-exclamation-circle me-1"></i>
+                                    {{ form.description.errors|join:" " }}
+                                </div>
+                            {% endif %}
+                        </div>
+                        
+                        <div class="row mb-3">
+                            <div class="col-md-6">
+                                <label for="{{ form.date.id_for_label }}" class="form-label">
+                                    Date <span class="text-danger">*</span>
+                                </label>
+                                <div class="input-group">
+                                    <span class="input-group-text"><i class="fas fa-calendar-days"></i></span>
+                                    {{ form.date }}
+                                </div>
+                                {% if form.date.errors %}
+                                    <div class="text-danger mt-1">
+                                        <i class="fas fa-exclamation-circle me-1"></i>
+                                        {{ form.date.errors|join:" " }}
+                                    </div>
+                                {% endif %}
+                            </div>
+                            
+                            <div class="col-md-6">
+                                <label for="{{ form.time.id_for_label }}" class="form-label">
+                                    Time <span class="text-danger">*</span>
+                                </label>
+                                <div class="input-group">
+                                    <span class="input-group-text"><i class="fas fa-clock"></i></span>
+                                    {{ form.time }}
+                                </div>
+                                {% if form.time.errors %}
+                                    <div class="text-danger mt-1">
+                                        <i class="fas fa-exclamation-circle me-1"></i>
+                                        {{ form.time.errors|join:" " }}
+                                    </div>
+                                {% endif %}
+                            </div>
+                        </div>
+                        
+                        <div class="row mb-3">
+                            <div class="col-md-6">
+                                <label for="{{ form.location.id_for_label }}" class="form-label">
+                                    Location <span class="text-danger">*</span>
+                                </label>
+                                <div class="input-group">
+                                    <span class="input-group-text"><i class="fas fa-map-marker-alt"></i></span>
+                                    {{ form.location }}
+                                </div>
+                                {% if form.location.errors %}
+                                    <div class="text-danger mt-1">
+                                        <i class="fas fa-exclamation-circle me-1"></i>
+                                        {{ form.location.errors|join:" " }}
+                                    </div>
+                                {% endif %}
+                            </div>
+                            
+                            <div class="col-md-6">
+                                <label for="{{ form.capacity.id_for_label }}" class="form-label">
+                                    Capacity <span class="text-danger">*</span>
+                                </label>
+                                {{ form.capacity }}
+                                <!-- {% if form.capacity.errors %}
+                                    <div class="text-danger mt-1">
+                                        <i class="fas fa-exclamation-circle me-1"></i>
+                                        {{ form.capacity.errors|join:" " }}
+                                    </div>
+                                {% endif %} -->
+                            </div>
+                        </div>
+                        
+                        <div class="mb-4">
+                            <label for="{{ form.status.id_for_label }}" class="form-label">
+                                Status
+                            </label>
+                            {{ form.status }}
+                        </div>
+                        
+                        <fieldset class="mb-3">
+                            <legend class="form-label fw-bold">
+                                Ticket Type <span class="text-danger">*</span>
+                            </legend>
+                            <div>
+                                <div class="form-check form-check-inline">
+                                    <input class="form-check-input" type="radio" name="ticket_type" id="ticketFree" value="free"
+                                    {% if form.ticket_type.value and form.ticket_type.value|stringformat:"s" == "free" %}checked{% endif %}>
+                                    <label class="form-check-label" for="ticketFree">Free</label>
+                                </div>
+                                <div class="form-check form-check-inline">
+                                    <input class="form-check-input" type="radio" name="ticket_type" id="ticketPaid" value="paid"
+                                    {% if form.ticket_type.value and form.ticket_type.value|stringformat:"s" == "paid" %}checked{% endif %}>
+                                    <label class="form-check-label" for="ticketPaid">Paid</label>
+                                </div>
+                            </div>
+                        </fieldset>
+                        
+
+                        <div id="paidFields" style="display: none;">
+
+                            <div class="mb-3">
+                                <label for="ticket_price" class="form-label fw-bold">
+                                    Ticket Price (PKR) <span class="text-danger">*</span>
+                                </label>
+                                <input type="number" min="0" name="ticket_price" id="ticket_price" class="form-control"
+                                value="{{ form.ticket_price.value|default_if_none:'' }}" required>
+
+                                {% if form.ticket_price.errors %}
+                                <div class="text-danger mt-1">
+                                    <i class="fas fa-exclamation-circle me-1"></i>
+                                    {{ form.ticket_price.errors|join:" " }}
+                                </div>
+                                {% endif %}
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label fw-bold">
+                                    Sale Date <span class="text-danger">*</span>
+                                </label>
+                                <div>
+                                    <div class="row mb-3">
+                                        <div class="col-md-6">
+                                            <label for="id_sale_start_date" class="form-label">
+                                                Start Date <span class="text-danger">*</span>
+                                            </label>
+                                            <div class="input-group">
+                                                <span class="input-group-text"><i
+                                                        class="fas fa-calendar-days"></i></span>
+                                                {{ form.sale_start_date }}
+                                            </div>
+                                            {% if form.sale_start_date.errors %}
+                                            <div class="text-danger mt-1">
+                                                <i class="fas fa-exclamation-circle me-1"></i>
+                                                {{ form.sale_start_date.errors|join:" " }}
+                                            </div>
+                                            {% endif %}
+                                        </div>
+
+                                        <div class="col-md-6">
+                                            <label for="id_sale_end_date" class="form-label">
+                                                End Date <span class="text-danger">*</span>
+                                            </label>
+                                            <div class="input-group">
+                                                <span class="input-group-text"><i
+                                                        class="fas fa-calendar-days"></i></span>
+                                                {{ form.sale_end_date }}
+                                            </div>
+                                            {% if form.sale_end_date.errors %}
+                                            <div class="text-danger mt-1">
+                                                <i class="fas fa-exclamation-circle me-1"></i>
+                                                {{ form.sale_end_date.errors|join:" " }}
+                                            </div>
+                                            {% endif %}
+                                        </div>
+                                    </div>
+                                </div>
+
+                            </div>
+                        </div> 
+                        <div class="d-flex justify-content-between">
+                            <a href="{% url 'dashboard' %}" class="btn btn-outline-secondary">
+                                <i class="fas fa-arrow-left me-2"></i> Back
+                            </a>
+                            <button type="submit" class="btn btn-primary">
+                                Save Changes
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        const freeRadio = document.getElementById('ticketFree');
+        const paidRadio = document.getElementById('ticketPaid');
+        const paidFields = document.getElementById('paidFields');
+        const ticketPriceInput = document.getElementById('ticket_price');
+        const saleStart = document.getElementById('id_sale_start_date');  // Use the generated ID for the sale start date input
+        const saleEnd = document.getElementById('id_sale_end_date');  
+        function togglePaidFields() {
+        if (paidRadio.checked) {
+            paidFields.style.display = 'block';
+            ticketPriceInput.setAttribute('required', 'required');
+            saleStart.setAttribute('required', 'required');
+            saleEnd.setAttribute('required', 'required');
+        } else {
+            paidFields.style.display = 'none';
+            ticketPriceInput.removeAttribute('required');
+            saleStart.removeAttribute('required');
+            saleEnd.removeAttribute('required');
+            ticketPriceInput.value = '';
+            saleStart.value = '';
+            saleEnd.value = '';
+        }
+    }
+
+        freeRadio.addEventListener('change', togglePaidFields);
+        paidRadio.addEventListener('change', togglePaidFields);
+
+        togglePaidFields(); // Run on page load in case of form errors
+    });
+</script>
+{% endblock %}
