@@ -1,0 +1,93 @@
+{% extends 'base.html' %}
+
+{% block title %}Register for {{ event.name }}{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+    <div class="row">
+        <div class="col-lg-8 mx-auto">
+            <nav aria-label="breadcrumb">
+                <ol class="breadcrumb">
+                    <li class="breadcrumb-item"><a href="{% url 'dashboard' %}">Dashboard</a></li>
+                    <li class="breadcrumb-item active">Register for Event</li>
+                </ol>
+            </nav>
+            
+            <div class="card shadow-sm">
+                <div class="card-header bg-white">
+                    <h3 class="card-title mb-0 text-navy">{{ event.name }}</h3>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <h5 class="mb-3">Event Details</h5>
+                            <p class="mb-2"><i class="fas fa-calendar-day me-2 text-muted"></i> <strong>Date:</strong> {{ event.date|date:"F d, Y" }}</p>
+                            <p class="mb-2"><i class="fas fa-clock me-2 text-muted"></i> <strong>Time:</strong> {{ event.time|time:"g:i A" }}</p>
+                            <p class="mb-2"><i class="fas fa-map-marker-alt me-2 text-muted"></i> <strong>Location:</strong> {{ event.get_location_display }}</p>
+                            <p class="mb-2"><i class="fas fa-users me-2 text-muted"></i> <strong>Capacity:</strong> {{ event.capacity }} attendees</p>
+                            <p class="mb-2"><i class="fas fa-ticket-alt me-2 text-muted"></i> <strong>Ticket Type:</strong> {{ event.get_ticket_type_display }}</p>
+                            {% if event.ticket_type == 'paid' %}
+                            <p class="mb-2"><i class="fas fa-money-bill me-2 text-muted"></i> <strong>Price:</strong> ${{ event.ticket_price }}</p>
+                            <p class="mb-2"><i class="fas fa-calendar-check me-2 text-muted"></i> <strong>Sales Period:</strong> {{ event.sale_start_date|date:"M d" }} - {{ event.sale_end_date|date:"M d, Y" }}</p>
+                            {% endif %}
+                        </div>
+                        <div class="col-md-6">
+                            <h5 class="mb-3">Description</h5>
+                            <p>{{ event.description }}</p>
+                            <p class="text-muted small">Organized by: {{ event.organizer.username }}</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="card-footer bg-transparent">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <a href="{% url 'dashboard' %}" class="btn btn-secondary">
+                            <i class="fas fa-arrow-left me-2"></i> Back to Dashboard
+                        </a>
+                        
+                        {% if already_registered %}
+                            <button class="btn btn-secondary" disabled>Already Registered</button>
+                        {% elif event.is_past_event %}
+                            <button class="btn btn-secondary" disabled>Event Has Passed</button>
+                        {% else %}
+                            <form method="post">
+                                {% csrf_token %}
+                                <button type="button" class="btn btn-success" data-bs-toggle="modal" data-bs-target="#confirmRegistrationModal">
+                                    <i class="fas fa-check-circle me-2"></i> Register Now
+                                </button>
+                            </form>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Confirmation Modal -->
+<div class="modal fade" id="confirmRegistrationModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <form method="post">
+                {% csrf_token %}
+                <div class="modal-header">
+                    <h5 class="modal-title">Confirm Registration</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <p>Are you sure you want to register for "{{ event.name }}"?</p>
+                    
+                    {% if event.ticket_type == 'paid' %}
+                    <div class="alert alert-info">
+                        <i class="fas fa-info-circle me-2"></i> This is a paid event. You'll need to pay <strong>${{ event.ticket_price }}</strong> to complete your registration.
+                    </div>
+                    {% endif %}
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="submit" class="btn btn-success">Confirm Registration</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}

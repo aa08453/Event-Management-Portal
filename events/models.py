@@ -1,14 +1,6 @@
 from django.db import models
-
-# Create your models here.
 from django.contrib.auth.models import User
 from django.utils import timezone
-
-# class Department(models.Model):
-#     name = models.CharField(max_length=100)
-    
-#     def __str__(self):
-#         return self.name
 
 class UserProfile(models.Model):
     USER_TYPES = (
@@ -17,7 +9,6 @@ class UserProfile(models.Model):
     )
     user = models.OneToOneField(User, on_delete=models.CASCADE, related_name='profile')
     user_type = models.CharField(max_length=15, choices=USER_TYPES, default='student')
-    # department = models.ForeignKey(Department, on_delete=models.SET_NULL, null=True, blank=True)
     
     def __str__(self):
         return f"{self.user.username} - {self.get_user_type_display()}"
@@ -51,13 +42,9 @@ class Event(models.Model):
     )
     
     ticket_type = models.CharField(max_length=10, choices=TICKET_TYPE_CHOICES, default='free')
-    #ticket_quantity = models.PositiveIntegerField(null=True, blank=True)
     ticket_price = models.DecimalField(max_digits=8, decimal_places=2, null=True, blank=True)
-
     sale_start_date = models.DateField(null=True, blank=True)
     sale_end_date = models.DateField(null=True, blank=True)
-    # sale_start_time = models.TimeField(null=True, blank=True)
-    # sale_end_time = models.TimeField(null=True, blank=True)
     
     def __str__(self):
         return self.name
@@ -69,13 +56,21 @@ class Event(models.Model):
         )
         return event_datetime < timezone.now()
     
+    @property
+    def remaining_capacity(self):
+        registered_count = self.registrations.count()
+        return max(0, self.capacity - registered_count)
+    
+    @property
+    def is_full(self):
+        return self.remaining_capacity <= 0
+    
     @classmethod
     def check_venue_availability(cls, location, date, time, exclude_id=None):
         """
         Check if the venue is already booked for a given date and time
         Returns True if the venue is available, False otherwise
         """
-        # print(location)
         # Convert time to a datetime.time object if it's a string
         if isinstance(time, str):
             import datetime
@@ -107,3 +102,21 @@ class Event(models.Model):
                 return False
                 
         return True
+
+class Registration(models.Model):
+    STATUS_CHOICES = (
+        ('pending', 'Pending'),
+        ('confirmed', 'Confirmed'),
+        ('cancelled', 'Cancelled'),
+    )
+    
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='registrations')
+    event = models.ForeignKey(Event, on_delete=models.CASCADE, related_name='registrations')
+    registration_date = models.DateTimeField(auto_now_add=True)
+    status = models.CharField(max_length=10, choices=STATUS_CHOICES, default='confirmed')
+    
+    class Meta:
+        unique_together = ('user', 'event')
+        
+    def __str__(self):
+        return f"{self.user.username} - {self.event.name}"

@@ -109,3 +109,6 @@ class EventForm(forms.ModelForm):
                     raise forms.ValidationError("Sale dates cannot be after the event date")
 
         return cleaned_data
+
+# class RegisterForm(forms.ModelForm):
+    

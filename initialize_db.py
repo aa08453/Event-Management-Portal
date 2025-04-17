@@ -59,7 +59,19 @@ def create_sample_data():
         UserProfile.objects.create(
             user=student,
             user_type='student',
-            # department=departments[2]
+        )
+        
+    if not User.objects.filter(username='student2').exists():
+        student = User.objects.create_user(
+            username='student2',
+            email='student2@university.edu',
+            password='password',
+            first_name='James',
+            last_name='Smith'
+        )
+        UserProfile.objects.create(
+            user=student,
+            user_type='student',
         )
     
     # Create events

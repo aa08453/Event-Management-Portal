@@ -25,5 +25,5 @@ urlpatterns = [
     path('', include('events.urls')),
     path('login/', custom_login, name='login'),
     path('logout/', auth_views.LogoutView.as_view(template_name='logout.html'), name='logout'),
-    #path('logout/', LogoutView.as_view(next_page='login'), name='logout'),
+    path('logout/', LogoutView.as_view(next_page='login'), name='logout'),
 ]
