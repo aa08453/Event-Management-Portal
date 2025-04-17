@@ -8,8 +8,5 @@
 **/__pycache__/
 **/*.py[cod]
 
-# Ignore the settings.py file
-/event_management_portal/settings.py
-
 # Ignore the .gitignore file itself
 .gitignore
