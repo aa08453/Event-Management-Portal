@@ -1,0 +1,15 @@
+
+
+# Ignore __pycache__ directories in specific folders
+/events/__pycache__/
+/event_management_portal/__pycache__/
+
+# Ignore all __pycache__ directories globally (optional, if you want to ignore them everywhere)
+**/__pycache__/
+**/*.py[cod]
+
+# Ignore the settings.py file
+/event_management_portal/settings.py
+
+# Ignore the .gitignore file itself
+.gitignore
